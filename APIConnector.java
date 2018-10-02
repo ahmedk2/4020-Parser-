@@ -1,45 +1,62 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 public class APIConnector {
-
 	
-	private ArrayList<String> urlList;
+	// Map of article title to article URL.
+	private Map<String, String> articlesMap;
 	
-	public APIConnector(ArrayList<String> urlList) {
-		this.urlList = urlList;
+	// We will be storing the Titles to ID map in this data structure.
+	private Map<String, String> IdMap = new HashMap<>();
+	
+	public APIConnector(Map<String, String> articlesMap) {
+		this.articlesMap = articlesMap;
 	}
 	
 	public void getXML() {
 		
 		// Loop through ArrayList containing URLs.
-		for (String url : urlList) {
+		for (String title : articlesMap.keySet()) {
+			
+			// Gets the URL string from our HashMap data structure.
+			String url = articlesMap.get(title);
 			
 			try {
 				// Create a new URL object with the URL string, and start a connection.
 				URL obj = new URL(url);
-				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+				InputStream in = obj.openStream();
 				
-				// Check HTTP response status.
-				int responseCode = con.getResponseCode();
-				System.out.println("Response: " + responseCode);
+				// XMLReader instantiation according to SAX documentation.
+				SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+				SAXParser parser = parserFactory.newSAXParser();
+				XMLReader reader = parser.getXMLReader();
 				
-				// Read input stream from connection.
-				InputStreamReader inputStream = new InputStreamReader(con.getInputStream());
-				BufferedReader in = new BufferedReader(inputStream);
+				// Tell XML reader to use our article parser handler.
+				ArticleParser handler = new ArticleParser();
+				reader.setContentHandler(handler);
 				
-				String inputLine;
-				StringBuilder response = new StringBuilder();
-				while((inputLine = in.readLine()) != null) {
-					response.append(inputLine);
-				}
-				in.close();
-				System.out.println(response.toString());
+				// XML Reader starts to parse.
+				InputSource inSource = new InputSource(in);
+				reader.parse(inSource);
+				
+				// Get the article ID from XML Reader.
+				String id = handler.getId();
+				
+				// Put the article title and article id in the map.
+				IdMap.put(title, id);
 				
 			} catch (MalformedURLException e) {
 				System.out.println("Error at URL");
@@ -47,10 +64,20 @@ public class APIConnector {
 			} catch (IOException e) {
 				System.out.println("Error at connecting to Server");
 				e.printStackTrace();
+			} catch (SAXException e) {
+				System.out.println("Error at parsing XML");
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				System.out.println("Error at parser config");
+				e.printStackTrace();
 			}
 			
 		}
 		
+	}
+	
+	public Map<String, String> getIdMap() {
+		return this.IdMap;
 	}
 	
 }
