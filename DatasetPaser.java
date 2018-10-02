@@ -15,11 +15,10 @@ import org.w3c.dom.Element;
 public class DatasetPaser {
 	ArrayList<String> ResultUrl = new ArrayList<>();
 	 
-	 
 	public DatasetPaser(File f){
 		File inputFile= f;
 		
-		try { 
+		try {
 		//initialize 
 		DocumentBuilderFactory  dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -30,6 +29,7 @@ public class DatasetPaser {
 		for (int i=0 ; i<5;i++)
 		{
 			ResultUrl.add(CreateUrl(TitleList.item(i).getTextContent()));
+			System.out.println(CreateUrl(TitleList.item(i).getTextContent()));
 		}
 	
 		

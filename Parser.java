@@ -16,10 +16,10 @@ public class Parser {
 	File input = new File ("4020a1-datasets.txt");
 	DatasetPaser myPaser= new DatasetPaser(input);
 	
-		 
+	APIConnector api = new APIConnector(myPaser.getResultUrls());
+	api.getXML();
+	
 	}
-	
-	
 }
 
 
