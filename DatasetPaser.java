@@ -1,25 +1,26 @@
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
 
 
 public class DatasetPaser {
+	
 	ArrayList<String> ResultUrl = new ArrayList<>();
-	 
+		
+	Map<String, String> articles = new HashMap<>();
 	 
 	public DatasetPaser(File f){
 		File inputFile= f;
 		
-		try { 
+		try {
 		//initialize 
 		DocumentBuilderFactory  dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -27,15 +28,15 @@ public class DatasetPaser {
 		doc.getDocumentElement().normalize();
 		NodeList TitleList = doc.getElementsByTagName("ArticleTitle");
 		
-		for (int i=0 ; i<5;i++)
-		{
-			ResultUrl.add(CreateUrl(TitleList.item(i).getTextContent()));
+		for (int i=0 ; i<5;i++) {
+			
+			String title = TitleList.item(i).getTextContent();
+			String url = CreateUrl(TitleList.item(i).getTextContent());
+			
+			// This maps the article title to its corresponding URL.
+			articles.put(title, url);
 		}
-	
-		
-		
-		
-		
+
 		} catch (Exception e){
 			e.printStackTrace();
 		}	
@@ -50,6 +51,10 @@ public class DatasetPaser {
 	
 	public ArrayList getResultUrls(){
 		return ResultUrl;
+	}
+	
+	public Map getArticlesMap() {
+		return this.articles;
 	}
 	 
 	
