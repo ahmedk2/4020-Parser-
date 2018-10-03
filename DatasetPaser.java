@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-
+//This class parses the dataset and generate urls.
 public class DatasetPaser {
 	
 	ArrayList<String> ResultUrl = new ArrayList<>();
@@ -28,7 +27,8 @@ public class DatasetPaser {
 		doc.getDocumentElement().normalize();
 		NodeList TitleList = doc.getElementsByTagName("ArticleTitle");
 		
-		for (int i=0 ; i<5;i++) {
+		//Loop through all titles
+		for (int i=0 ; i<10;i++) {
 			
 			String title = TitleList.item(i).getTextContent();
 			String url = CreateUrl(TitleList.item(i).getTextContent());
@@ -43,16 +43,18 @@ public class DatasetPaser {
 		
 		
 		
-		//Store all titles in a Nodelist 
+		
 		
 		
 		
 	}
 	
+	//return all urls as an arraylist 
 	public ArrayList getResultUrls(){
 		return ResultUrl;
 	}
 	
+	//return article title and its corresponding URL as map
 	public Map getArticlesMap() {
 		return this.articles;
 	}
@@ -60,13 +62,15 @@ public class DatasetPaser {
 	
 	
 	
-	
+	//create a single url 
 	String CreateUrl (String t){
 			String Title = t;
 
 			
-			//Get rid of special characters
-			String result = Title.replaceAll("[+.'^:,?]","");
+			//Do url encoding on "'s"
+			String result = Title.replace("'s", "%27s");
+			//Get rid of other special characters
+			result = result.replaceAll("[+.'^:,?]","");
 			//Separate each word, put them into an array
 			String[] Splited = result.split("\\s+");
 			String Url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=";
